@@ -1,19 +1,35 @@
 #!/usr/bin/python
 import os
-os.system('yum install samba samba-client -y')
-os.system('mkdir /test1')
-os.system('touch /test1/test{1..10}.txt')
-os.system('chcon -t samba_share_t /test1/')
-os.system('chcon -t samba_share_t /test1/*')
-os.system('useradd sai')
-os.system('smbpasswd -a sai')
-file=open("/etc/samba/smb.conf","a")
-var="[share]\ncomment=Public Stuff\npath=/test1\npublic=yes\nwritable=yes\nbrowsable=yes\nvalid users=sai\nhosts allow=172.25.12."
-file.write(var)
-file.close()
-os.system('testparm -t')
-os.system('systemctl restart smb nmb')
-os.system('systemctl enable smb nmb')
-os.system('firewall-cmd --permanent --add-service=samba')
-os.system('firewall-cmd --reload')
+import sys
+import crypt
+a = raw_input("Enter No. Of user :") 
+def createuser (useradd1,passwd1):
+	epass = crypt.crypt(passwd1,"22")
+        return os.system(" useradd -p"+epass+ "-s" +"/bin/bash"+"-d"+"/home/"+useradd1+"-m"+"-c \"\"" +useradd1)
 
+
+def sambaserver(user1):	
+	f = raw_input ("Enter Directory name:")
+	net = raw_input("Enter Networ :")
+	sb = raw_input("Enter you samba share name :")
+	os.system('yum install samba samba-client cifs-utils -y')
+	os.system("mkdir %s"%f )
+	os.system("chcon -t samba_share_t %s "%f)
+	os.system('echo [%s] >> /etc/samba/smb.conf'%sb)
+	os.system('echo comment = public >> /etc/samba/smb.conf')
+	os.system('echo path = %s >> /etc/samba/smb.conf'%f)
+	os.system('echo public = yes >> /etc/samba/smb.conf')
+	os.system('echo browsable = yes >> /etc/samba/smb.conf')
+	os.system("echo valid users = %s >> /etc/samba/smb.conf"%user1)
+	os.system("echo host allow = %s >> /etc/samba/smb.conf"%net)
+	os.system('firewall-cmd --permanent --add-service=samba')
+	os.system('firewall-cmd --reload')
+	os.system("smbpasswd -a %s"%user1)
+	os.system('systemctl restart smb nmb')
+	os.system('systemctl enable smb nmb')
+for x in range(a)
+	useradd = raw_input("Enter User name :")
+        passwd = raw_input("Enter password :")
+	createuser(useradd,passwd)
+	sambaserver(useradd)
+	
